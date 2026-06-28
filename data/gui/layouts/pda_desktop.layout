@@ -1,0 +1,1073 @@
+FrameWidgetClass PDA_Root {
+ position 0 0
+ size 0.8 0.75
+ halign center_ref
+ valign center_ref
+ hexactpos 0
+ vexactpos 0
+ hexactsize 0
+ vexactsize 0
+ {
+  ImageWidgetClass DesktopBackground {
+   visible 1
+   clipchildren 1
+   ignorepointer 1
+   position 0 0
+   size 1 1
+   halign center_ref
+   valign center_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 0
+   scaled 1
+   draggable 0
+   image0 ""
+   imageTexture "ButchersHell_PDA/data/gui/edds/pda_background.edds"
+   mode blend
+   "src alpha" 1
+   "stretch mode" stretch_w_h
+   {
+    FrameWidgetClass StatusBar {
+     disabled 0
+     ignorepointer 1
+     position -0.006 0.156
+     size 0.776 0.07
+     halign center_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     {
+      TextWidgetClass txt_Date {
+       ignorepointer 1
+       position 0 -0.25
+       size 0.098 0.5
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "2026.06.28"
+       text_proportion 0.5
+       "text halign" center
+       "text valign" center
+      }
+      TextWidgetClass txt_Time {
+       ignorepointer 1
+       position 0 0.246
+       size 0.098 0.5
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "14:32"
+       text_proportion 0.5
+       "text halign" center
+       "text valign" center
+      }
+      TextWidgetClass txt_Battery {
+       ignorepointer 1
+       position 0.112 0.25
+       size 0.111 0.5
+       halign right_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Battery: 78%"
+       text_proportion 0.5
+       "text halign" center
+       "text valign" center
+      }
+      TextWidgetClass txt_Signal {
+       ignorepointer 1
+       position 0.112 -0.248
+       size 0.086 0.5
+       halign right_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Signal: "
+       text_proportion 0.5
+       "text valign" center
+      }
+      ButtonWidgetClass btn_Close {
+       size 0.111 1
+       halign right_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Default
+       "no focus" 1
+       text "Exit"
+      }
+      TextWidgetClass syt_SystemMessage_txt {
+       ignorepointer 1
+       position -0.059 0
+       size 0.65 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "SystemMessage"
+       "text halign" center
+      }
+     }
+    }
+    FrameWidgetClass FunctionButtons {
+     ignorepointer 1
+     position -0.016 0.098
+     size 0.567 0.049
+     halign center_ref
+     valign bottom_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     {
+      ButtonWidgetClass btn_Home {
+       position -0.412 0
+       size 0.167 1.006
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       "no focus" 1
+       text "Home"
+       text_proportion 0.5
+       switch normal
+      }
+      ButtonWidgetClass btn_Map {
+       position -0.243 0.017
+       size 0.163 1.006
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       "no focus" 1
+       text "Map"
+       text_proportion 0.5
+      }
+      ButtonWidgetClass btn_Contacts {
+       position -0.08 0.01
+       size 0.155 1.006
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       scaled 1
+       "no focus" 1
+       text "Contacts"
+       text_proportion 0.5
+      }
+      ButtonWidgetClass btn_Files {
+       position 0.079 0.007
+       size 0.154 1.006
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       "no focus" 1
+       text "Files"
+       text_proportion 0.5
+      }
+      ButtonWidgetClass btn_Notes {
+       position 0.244 -0.006
+       size 0.167 1.006
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       "no focus" 1
+       text "Notes"
+       text_proportion 0.5
+      }
+      ButtonWidgetClass btn_Profile {
+       position 0.414 -0.008
+       size 0.163 1.006
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       "no focus" 1
+       text "Profile"
+       text_proportion 0.5
+      }
+     }
+    }
+    FrameWidgetClass Main {
+     ignorepointer 1
+     position -0.004 0.03
+     size 0.782 0.609
+     halign center_ref
+     valign center_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     {
+      FrameWidgetClass screen_Register {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass rgr_Register {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 0.6 0.6
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass rgr_Name {
+           ignorepointer 1
+           position 0 -0.402
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Register Name"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass rgr_Name_txt {
+           position 0 -0.292
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           text "Login Name..."
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          TextWidgetClass rgr_Pasword {
+           ignorepointer 1
+           position 0 -0.142
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Password"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass rgr_Password_txt {
+           position 0 -0.031
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           text "**********"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          TextWidgetClass rgr_PaswordAgain {
+           ignorepointer 1
+           position 0 0.081
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Password Again"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass rgr_PasswordAgain_txt {
+           position 0 0.19
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           text "**********"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          ButtonWidgetClass rgr_Register_btn {
+           position 0 0.07
+           size 0.3 0.1
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Register"
+           switch normal
+          }
+         }
+        }
+        ButtonWidgetClass rgr_Login_btn {
+         position 0.03 0.03
+         size 0.17 0.08
+         halign right_ref
+         valign bottom_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Editor
+         "no focus" 1
+         text "Login"
+        }
+       }
+      }
+      FrameWidgetClass screen_Login {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass lgn_Login {
+         ignorepointer 1
+         position 0 0
+         size 0.6 0.6
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass lgn_Name {
+           ignorepointer 1
+           position 0 -0.402
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Login Name"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass lgn_Name_txt {
+           position 0 -0.292
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           text "Login Name..."
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          TextWidgetClass lgn_Pasword {
+           ignorepointer 1
+           position 0 -0.142
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Password"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass lgn_Password_txt {
+           position 0 -0.031
+           size 0.3 0.1
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 0
+           text "**********"
+           "limit visible" 0
+           "Use default text" 0
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          ButtonWidgetClass lgn_Login_btn {
+           position 0 0.07
+           size 0.3 0.1
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Login"
+           switch normal
+          }
+         }
+        }
+        ButtonWidgetClass lgn_Register_btn {
+         position 0.03 0.03
+         size 0.17 0.08
+         halign right_ref
+         valign bottom_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Editor
+         "no focus" 1
+         text "Register"
+        }
+       }
+      }
+      FrameWidgetClass screen_Pin {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass pn_Pin {
+         ignorepointer 1
+         position 0 0
+         size 0.3 0.4
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass pn_Pin_txt {
+           clipchildren 1
+           inheritalpha 0
+           ignorepointer 1
+           ignoregloballv 0
+           position 0 0
+           size 1 0.3
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "PIN"
+           "exact text" 1
+           "size to text h" 0
+           "size to text v" 0
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass pn__PinCode_txt {
+           size 1 0.3
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           "no focus" 0
+           text "*******"
+           "limit visible" 0
+           "Use default text" 0
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          ButtonWidgetClass pn_Login_btn {
+           position 0 0
+           size 1 0.3
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Login"
+          }
+         }
+        }
+       }
+      }
+      FrameWidgetClass screen_Home {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        TextWidgetClass txt_Home {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Home"
+        }
+       }
+      }
+      FrameWidgetClass screen_Map {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        TextWidgetClass txt_Map {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Map"
+        }
+       }
+      }
+      FrameWidgetClass screen_Contacts {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass ctc_Contacs {
+         ignorepointer 1
+         position 0 -0.002
+         size 0.3 1
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextListboxWidgetClass ctc_ContactList {
+           position 0 0.14
+           size 1 0.79
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "title visible" 0
+           colums "#pda_contact_list;90;   ;10;"
+           lines 1
+           "highlight row" 1
+          }
+          TextWidgetClass ctc_ContactListName {
+           ignorepointer 1
+           position 0 0
+           size 1 0.07
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Normal
+           text "Contacts"
+           "exact text" 0
+           "size to text h" 0
+           "size to text v" 0
+           "text halign" center
+           "text valign" center
+          }
+          ButtonWidgetClass ctc_ContactAdd_btn {
+           position 0 0
+           size 1 0.07
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Add Conctact"
+          }
+          EditBoxWidgetClass ctc_ContactAdd_txt {
+           position 0 0.07
+           size 1 0.07
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 0
+           text "Conctact Name..."
+           "limit visible" 0
+           "Use default text" 0
+           "exact text" 1
+           "text valign" center
+          }
+         }
+        }
+        FrameWidgetClass ctc_Chat {
+         ignorepointer 1
+         position 0 0
+         size 0.7 1
+         halign right_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextListboxWidgetClass ctc_ChatMessages {
+           size 1 0.85
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "title visible" 0
+           colums "#pda_sender;15;#pda_message;85;"
+           lines 1
+          }
+          EditBoxWidgetClass ctc_ChatSendMsg_txt {
+           position 0 0
+           size 0.8 0.15
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 0
+           text "Text..."
+           "exact text" 1
+           "text valign" center
+          }
+          ButtonWidgetClass ctc_ChatSendMsg_btn {
+           position 0 0
+           size 0.2 0.15
+           halign right_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Send"
+          }
+         }
+        }
+       }
+      }
+      FrameWidgetClass screen_Files {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass fls_Categorys {
+         ignorepointer 1
+         position 0 0
+         size 0.3 1
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass fls_CategoryListName_txt {
+           ignorepointer 1
+           position 0 0
+           size 1 0.05
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Category"
+           "text halign" center
+           "text valign" center
+          }
+          TextListboxWidgetClass fls_CategoryList_txt {
+           size 1 0.95
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "title visible" 0
+           colums "#pda_fls_category_list;90;   ;10;"
+          }
+         }
+        }
+        FrameWidgetClass fls_Files {
+         ignorepointer 1
+         position -0.05 0
+         size 0.3 1
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass fls_FilesName_txt {
+           ignorepointer 1
+           position 0 0
+           size 1 0.05
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Files"
+           "text halign" center
+           "text valign" center
+          }
+          TextListboxWidgetClass fls_FileList_txt {
+           size 1 0.95
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           colums "#pda_fls_file_list;90;   ;10;"
+          }
+         }
+        }
+        FrameWidgetClass fls_Content {
+         ignorepointer 1
+         position 0 0
+         size 0.4 1
+         halign right_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+        }
+       }
+      }
+      FrameWidgetClass screen_Notes {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass nts_Categorys {
+         ignorepointer 1
+         position 0 0
+         size 0.3 1
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass nts_CategoryName_txt {
+           ignorepointer 1
+           position 0 0
+           size 1 0.05
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Category"
+           "text halign" center
+           "text valign" center
+          }
+          TextListboxWidgetClass nts_CategoryList_txt {
+           position 0 -0.025
+           size 1 0.85
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           colums "#pda_nts_category_list;90;   ;10;"
+          }
+          ButtonWidgetClass nts_AddCategory_btn {
+           position 0 0.05
+           size 0.5 0.05
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Add Category"
+          }
+          ButtonWidgetClass nts_RemoveCategory_btn {
+           position 0 0.05
+           size 0.5 0.05
+           halign right_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Delete Category"
+          }
+          EditBoxWidgetClass nts_AddRemoveCategory_txt {
+           position 0 0
+           size 1 0.05
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 0
+           text "Category Name...."
+           "Use default text" 0
+           "exact text" 1
+           "text valign" center
+          }
+         }
+        }
+        FrameWidgetClass nts_Files {
+         ignorepointer 1
+         position -0.05 0
+         size 0.3 1
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass nts_FileName_txt {
+           ignorepointer 1
+           position 0 0
+           size 1 0.05
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Notes"
+           "text halign" center
+           "text valign" center
+          }
+          TextListboxWidgetClass nts_FileList_txt {
+           position 0 -0.025
+           size 1 0.85
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           colums "#pda_nts_note_list;90;   ;10;"
+          }
+          ButtonWidgetClass nts_AddFile_btn {
+           position 0 0.05
+           size 0.5 0.05
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Add File"
+          }
+          ButtonWidgetClass nts_RemoveFile_btn {
+           position 0 0.05
+           size 0.5 0.05
+           halign right_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Delete File"
+          }
+          EditBoxWidgetClass nts_AddRemoveFile_txt {
+           position 0 0
+           size 1 0.05
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 0
+           text "Note Name..."
+           "exact text" 1
+          }
+         }
+        }
+        FrameWidgetClass nts_Content {
+         ignorepointer 1
+         position 0 0
+         size 0.4 1
+         halign right_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+        }
+       }
+      }
+      FrameWidgetClass screen_Profile {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        TextWidgetClass txt_Profile {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Profile"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}
