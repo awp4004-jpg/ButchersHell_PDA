@@ -173,11 +173,20 @@ protected string m_LastOpenedApp = "Home";
 
     void ShowSystemMessage(string message)
     {
+        if (!m_SystemMessage) return;
+
+        m_SystemMessage.SetText(message);
+
+        // Clear the message after 5 seconds
+        GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ClearSystemMessage, 5000, false);
+    }
+
+    void ClearSystemMessage()
+    {
         if (m_SystemMessage)
         {
-            m_SystemMessage.SetText(message);
+            m_SystemMessage.SetText("");
         }
-        Print("[PDA] " + message);
     }
 
     // ==================== Updated OnClick ====================
@@ -263,12 +272,12 @@ protected string m_LastOpenedApp = "Home";
 
         if (data.param1)
         {
-            ShowSystemMessage("Registration successful! Please login.");
+            ShowSystemMessage("Registration successful!");   // ← Changed
             ShowAuthScreen("Login");
         }
         else
         {
-            ShowSystemMessage("Registration failed. Username may already exist.");
+            ShowSystemMessage("Registration failed."); // ← Changed
         }
     }
 
@@ -281,13 +290,13 @@ protected string m_LastOpenedApp = "Home";
 
         if (data.param1)
         {
-            ShowSystemMessage("Login successful!");
+            ShowSystemMessage("Login successful!");     // ← Changed
             m_IsLoggedIn = true;
             ShowMainScreen(m_LastOpenedApp);
         }
         else
         {
-            ShowSystemMessage("Login failed. Wrong username or password.");
+            ShowSystemMessage("Login failed."); // ← Changed
         }
     }
 
