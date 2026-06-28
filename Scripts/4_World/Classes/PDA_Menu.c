@@ -1,8 +1,9 @@
 class PDA_Menu extends UIScriptedMenu
 {
-protected string m_LastOpenedApp = "Home";
+    protected string m_LastOpenedApp = "Home";
     protected bool m_IsLoggedIn = false;
     protected bool m_IsRegistered = false;
+    static bool s_IsLoggedInThisSession = false;
 
     protected TextWidget m_txtTime;
     protected TextWidget m_txtBattery;
@@ -38,19 +39,19 @@ protected string m_LastOpenedApp = "Home";
         {
             root.Show(true);
 
-            // Status bar widgets
-            m_txtTime    = TextWidget.Cast(root.FindAnyWidget("txt_Time"));
-            m_txtBattery = TextWidget.Cast(root.FindAnyWidget("txt_Battery"));
-            m_txtSignal  = TextWidget.Cast(root.FindAnyWidget("txt_Signal"));
-            m_txtDate    = TextWidget.Cast(root.FindAnyWidget("txt_Date"));
+            // === Status bar widgets ===
+            m_txtTime       = TextWidget.Cast(root.FindAnyWidget("txt_Time"));
+            m_txtBattery    = TextWidget.Cast(root.FindAnyWidget("txt_Battery"));
+            m_txtSignal     = TextWidget.Cast(root.FindAnyWidget("txt_Signal"));
+            m_txtDate       = TextWidget.Cast(root.FindAnyWidget("txt_Date"));
             m_SystemMessage = TextWidget.Cast(root.FindAnyWidget("syt_SystemMessage_txt"));
 
-            // Auth screens
+            // === Auth screens ===
             m_screenRegister = root.FindAnyWidget("screen_Register");
             m_screenLogin    = root.FindAnyWidget("screen_Login");
             m_screenPin      = root.FindAnyWidget("screen_Pin");
 
-            // Main screens
+            // === Main screens ===
             m_screenHome     = root.FindAnyWidget("screen_Home");
             m_screenMap      = root.FindAnyWidget("screen_Map");
             m_screenContacts = root.FindAnyWidget("screen_Contacts");
@@ -64,32 +65,33 @@ protected string m_LastOpenedApp = "Home";
             m_rgrName          = EditBoxWidget.Cast(root.FindAnyWidget("rgr_Name_txt"));
             m_rgrPassword      = EditBoxWidget.Cast(root.FindAnyWidget("rgr_Password_txt"));
             m_rgrPasswordAgain = EditBoxWidget.Cast(root.FindAnyWidget("rgr_PasswordAgain_txt"));
-
-            m_lgnName     = EditBoxWidget.Cast(root.FindAnyWidget("lgn_Name_txt"));
-            m_lgnPassword = EditBoxWidget.Cast(root.FindAnyWidget("lgn_Password_txt"));
+            m_lgnName          = EditBoxWidget.Cast(root.FindAnyWidget("lgn_Name_txt"));
+            m_lgnPassword      = EditBoxWidget.Cast(root.FindAnyWidget("lgn_Password_txt"));
 
             // Register RPC responses
             GetRPCManager().AddRPC("PDA", "RPC_RegisterResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_LoginResponse", this, SingleplayerExecutionType.Client);
 
-            // Load if player is registered (this stays saved)
+            // Load if player is registered (permanent)
             string registered;
             if (GetGame().GetProfileString("PDA_IsRegistered", registered))
             {
                 m_IsRegistered = (registered == "true");
             }
 
-            // Always reset login state on new connection
-            m_IsLoggedIn = false;
-
-            // Decide starting screen
+            // === NEW LOGIC: Only ask to login once per reconnect ===
             if (!m_IsRegistered)
             {
                 ShowAuthScreen("Register");
             }
+            else if (!s_IsLoggedInThisSession)   // Static variable
+            {
+                ShowAuthScreen("Login");
+            }
             else
             {
-                ShowAuthScreen("Login");   // Always start with Login after reconnect
+                // Already logged in this session → go to last screen
+                ShowMainScreen(m_LastOpenedApp);
             }
         }
         
@@ -116,6 +118,7 @@ protected string m_LastOpenedApp = "Home";
     {
         LockBottomButtons(false);
         m_IsLoggedIn = true;                    // Only for current session
+        s_IsLoggedInThisSession = true;
 
         // Hide auth screens
         if (m_screenRegister) m_screenRegister.Show(false);
