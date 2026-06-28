@@ -19,3 +19,15 @@ modded class MissionBase
         return menu;
     }
 }
+modded class MissionGameplay
+{
+    override void OnMissionFinish()
+    {
+        super.OnMissionFinish();
+
+        // Reset PDA login state when disconnecting from server
+        PDA_Menu.s_IsLoggedInThisSession = false;
+
+        Print("[PDA] Login session reset (disconnected from server)");
+    }
+}

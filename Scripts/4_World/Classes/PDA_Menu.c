@@ -3,6 +3,7 @@ class PDA_Menu extends UIScriptedMenu
     protected string m_LastOpenedApp = "Home";
     protected bool m_IsLoggedIn = false;
     protected bool m_IsRegistered = false;
+
     static bool s_IsLoggedInThisSession = false;
 
     protected TextWidget m_txtTime;
@@ -14,7 +15,6 @@ class PDA_Menu extends UIScriptedMenu
     protected Widget m_screenRegister;
     protected Widget m_screenLogin;
     protected Widget m_screenPin;
-
     protected Widget m_screenHome;
     protected Widget m_screenMap;
     protected Widget m_screenContacts;
@@ -27,7 +27,6 @@ class PDA_Menu extends UIScriptedMenu
     protected EditBoxWidget m_rgrName;
     protected EditBoxWidget m_rgrPassword;
     protected EditBoxWidget m_rgrPasswordAgain;
-
     protected EditBoxWidget m_lgnName;
     protected EditBoxWidget m_lgnPassword;
 
@@ -39,19 +38,19 @@ class PDA_Menu extends UIScriptedMenu
         {
             root.Show(true);
 
-            // === Status bar widgets ===
+            // Status bar
             m_txtTime       = TextWidget.Cast(root.FindAnyWidget("txt_Time"));
             m_txtBattery    = TextWidget.Cast(root.FindAnyWidget("txt_Battery"));
             m_txtSignal     = TextWidget.Cast(root.FindAnyWidget("txt_Signal"));
             m_txtDate       = TextWidget.Cast(root.FindAnyWidget("txt_Date"));
             m_SystemMessage = TextWidget.Cast(root.FindAnyWidget("syt_SystemMessage_txt"));
 
-            // === Auth screens ===
+            // Auth screens
             m_screenRegister = root.FindAnyWidget("screen_Register");
             m_screenLogin    = root.FindAnyWidget("screen_Login");
             m_screenPin      = root.FindAnyWidget("screen_Pin");
 
-            // === Main screens ===
+            // Main screens
             m_screenHome     = root.FindAnyWidget("screen_Home");
             m_screenMap      = root.FindAnyWidget("screen_Map");
             m_screenContacts = root.FindAnyWidget("screen_Contacts");
@@ -72,25 +71,22 @@ class PDA_Menu extends UIScriptedMenu
             GetRPCManager().AddRPC("PDA", "RPC_RegisterResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_LoginResponse", this, SingleplayerExecutionType.Client);
 
-            // Load if player is registered (permanent)
+            // Load registration state
             string registered;
             if (GetGame().GetProfileString("PDA_IsRegistered", registered))
-            {
                 m_IsRegistered = (registered == "true");
-            }
 
-            // === NEW LOGIC: Only ask to login once per reconnect ===
+            // Decide starting screen
             if (!m_IsRegistered)
             {
                 ShowAuthScreen("Register");
             }
-            else if (!s_IsLoggedInThisSession)   // Static variable
+            else if (!s_IsLoggedInThisSession)
             {
                 ShowAuthScreen("Login");
             }
             else
             {
-                // Already logged in this session → go to last screen
                 ShowMainScreen(m_LastOpenedApp);
             }
         }
@@ -98,6 +94,7 @@ class PDA_Menu extends UIScriptedMenu
         return root;
     }
 
+    // ==================== SCREEN CONTROL ====================
     void ShowAuthScreen(string screenName)
     {
         LockBottomButtons(true);
@@ -106,27 +103,30 @@ class PDA_Menu extends UIScriptedMenu
         if (m_screenLogin)    m_screenLogin.Show(false);
         if (m_screenPin)      m_screenPin.Show(false);
 
-        if (screenName == "Register" && m_screenRegister)
-            m_screenRegister.Show(true);
-        else if (screenName == "Login" && m_screenLogin)
-            m_screenLogin.Show(true);
-        else if (screenName == "Pin" && m_screenPin)
-            m_screenPin.Show(true);
+        if (screenName == "Register" && m_screenRegister) m_screenRegister.Show(true);
+        else if (screenName == "Login" && m_screenLogin)  m_screenLogin.Show(true);
+        else if (screenName == "Pin" && m_screenPin)      m_screenPin.Show(true);
     }
 
     void ShowMainScreen(string screenName)
     {
         LockBottomButtons(false);
-        m_IsLoggedIn = true;                    // Only for current session
+        m_IsLoggedIn = true;
         s_IsLoggedInThisSession = true;
 
-        // Hide auth screens
         if (m_screenRegister) m_screenRegister.Show(false);
         if (m_screenLogin)    m_screenLogin.Show(false);
         if (m_screenPin)      m_screenPin.Show(false);
 
         m_LastOpenedApp = screenName;
-        GetGame().SetProfileString("LastPDA_Screen", screenName);
+
+        // Save last screen to server
+        PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+        if (player && player.GetIdentity())
+        {
+            GetRPCManager().SendRPC("PDA", "RPC_SaveLastScreen", 
+                new Param2<string, string>(player.GetIdentity().GetName(), screenName), true);
+        }
 
         // Hide all main screens
         if (m_screenHome)     m_screenHome.Show(false);
@@ -156,43 +156,21 @@ class PDA_Menu extends UIScriptedMenu
             m_FunctionButtons.Enable(!lock);
     }
 
-    override bool OnFocus(Widget w, int x, int y)
-    {
-        EditBoxWidget edit = EditBoxWidget.Cast(w);
-        if (!edit) return false;
-
-        string currentText = edit.GetText();
-
-        // List of placeholder texts you want to clear
-        if (currentText == "Login Name..." || currentText == "**********" || currentText == "Conctact Name..." || currentText == "Text..." || currentText == "Category Name...." || currentText == "Note Name..." || currentText == "*******")
-        {
-            edit.SetText("");
-        }
-
-        return false;
-    }
-
-    // ==================== System Message ====================
-
+    // ==================== SYSTEM MESSAGE ====================
     void ShowSystemMessage(string message)
     {
         if (!m_SystemMessage) return;
-
         m_SystemMessage.SetText(message);
-
-        // Clear the message after 5 seconds
         GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ClearSystemMessage, 5000, false);
     }
 
     void ClearSystemMessage()
     {
         if (m_SystemMessage)
-        {
             m_SystemMessage.SetText("");
-        }
     }
 
-    // ==================== Updated OnClick ====================
+    // ==================== BUTTON HANDLING ====================
     override bool OnClick(Widget w, int x, int y, int button)
     {
         if (button != MouseState.LEFT) return false;
@@ -201,57 +179,33 @@ class PDA_Menu extends UIScriptedMenu
 
         if (name == "btn_Close") { Close(); return true; }
 
-        // Switch between Register <-> Login
-        if (name == "rgr_Login_btn")
-        {
-            ShowAuthScreen("Login");
-            return true;
-        }
+        // Switch between Register and Login
+        if (name == "rgr_Login_btn")   { ShowAuthScreen("Login"); return true; }
+        if (name == "lgn_Register_btn") { ShowAuthScreen("Register"); return true; }
 
-        if (name == "lgn_Register_btn")
-        {
-            ShowAuthScreen("Register");
-            return true;
-        }
-
-        // ==================== REGISTER ====================
+        // Register
         if (name == "rgr_Register_btn")
         {
-            if (!m_rgrName || !m_rgrPassword || !m_rgrPasswordAgain) return true;
+            string u = m_rgrName.GetText();
+            string p1 = m_rgrPassword.GetText();
+            string p2 = m_rgrPasswordAgain.GetText();
 
-            string regUser = m_rgrName.GetText();
-            string regPass1 = m_rgrPassword.GetText();
-            string regPass2 = m_rgrPasswordAgain.GetText();
+            if (u == "" || p1 == "" || p2 == "") { ShowSystemMessage("Please fill all fields"); return true; }
+            if (p1 != p2) { ShowSystemMessage("Passwords do not match!"); return true; }
 
-            if (regUser == "" || regPass1 == "" || regPass2 == "")
-            {
-                ShowSystemMessage("Please fill all fields");
-                return true;
-            }
-
-            if (regPass1 != regPass2)
-            {
-                ShowSystemMessage("Passwords do not match!");
-                return true;
-            }
-
-            GetRPCManager().SendRPC("PDA", "RPC_RegisterAccount", new Param2<string, string>(regUser, regPass1), true);
+            GetRPCManager().SendRPC("PDA", "RPC_RegisterAccount", new Param2<string, string>(u, p1), true);
             return true;
         }
 
-        // ==================== LOGIN ====================
+        // Login
         if (name == "lgn_Login_btn")
         {
-            if (!m_lgnName || !m_lgnPassword) return true;
-
-            string loginUser = m_lgnName.GetText();
-            string loginPass = m_lgnPassword.GetText();
-
-            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(loginUser, loginPass), true);
+            string u = m_lgnName.GetText();
+            string p = m_lgnPassword.GetText();
+            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(u, p), true);
             return true;
         }
 
-        // Main screen buttons
         if (!m_IsLoggedIn) return false;
 
         if (name == "btn_Home")     { ShowMainScreen("Home"); return true; }
@@ -264,52 +218,47 @@ class PDA_Menu extends UIScriptedMenu
         return false;
     }
 
-    // ==================== RPC Responses ====================
-
+    // ==================== RPC RESPONSES ====================
     void RPC_RegisterResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
     {
         if (type != CallType.Client) return;
-
         Param1<bool> data;
         if (!ctx.Read(data)) return;
 
         if (data.param1)
         {
-            ShowSystemMessage("Registration successful!");   // ← Changed
+            ShowSystemMessage("Registration successful!");
             ShowAuthScreen("Login");
         }
         else
         {
-            ShowSystemMessage("Registration failed."); // ← Changed
+            ShowSystemMessage("Registration failed.");
         }
     }
 
     void RPC_LoginResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
     {
         if (type != CallType.Client) return;
-
-        Param1<bool> data;
+        Param2<bool, string> data;
         if (!ctx.Read(data)) return;
 
         if (data.param1)
         {
-            ShowSystemMessage("Login successful!");     // ← Changed
+            ShowSystemMessage("Login successful!");
             m_IsLoggedIn = true;
-            ShowMainScreen(m_LastOpenedApp);
+            s_IsLoggedInThisSession = true;
+            ShowMainScreen(data.param2 != "" ? data.param2 : "Home");
         }
         else
         {
-            ShowSystemMessage("Login failed."); // ← Changed
+            ShowSystemMessage("Login failed.");
         }
     }
 
+    // ==================== OTHER ====================
     override bool OnKeyPress(Widget w, int x, int y, int key)
     {
-        if (key == KeyCode.KC_ESCAPE)
-        {
-            Close();
-            return true;
-        }
+        if (key == KeyCode.KC_ESCAPE) { Close(); return true; }
         return false;
     }
 
@@ -322,50 +271,32 @@ class PDA_Menu extends UIScriptedMenu
     void UpdateStatusBar()
     {
         int year, month, day, hour, minute;
+        GetGame().GetWorld().GetDate(year, month, day, hour, minute);
 
-        if (m_txtTime)
-        {
-            GetGame().GetWorld().GetDate(year, month, day, hour, minute);
-            m_txtTime.SetText(string.Format("%1:%2", hour.ToStringLen(2), minute.ToStringLen(2)));
-        }
-
-        if (m_txtDate)
-        {
-            GetGame().GetWorld().GetDate(year, month, day, hour, minute);
-            m_txtDate.SetText(string.Format("%1.%2.%3", year, month.ToStringLen(2), day.ToStringLen(2)));
-        }
+        if (m_txtTime)  m_txtTime.SetText(string.Format("%1:%2", hour.ToStringLen(2), minute.ToStringLen(2)));
+        if (m_txtDate)  m_txtDate.SetText(string.Format("%1.%2.%3", year, month.ToStringLen(2), day.ToStringLen(2)));
 
         if (m_txtBattery)
         {
             PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
             if (player)
             {
-                ItemBase itemInHands = player.GetItemInHands();
-                if (itemInHands)
+                ItemBase item = player.GetItemInHands();
+                if (item)
                 {
-                    EntityAI battery = itemInHands.FindAttachmentBySlotName("BatteryD");
+                    EntityAI battery = item.FindAttachmentBySlotName("BatteryD");
                     if (battery && battery.HasEnergyManager())
                     {
-                        float energy01 = battery.GetCompEM().GetEnergy0To1();
-                        int percent = Math.Round(energy01 * 100);
-                        m_txtBattery.SetText("Battery: " + percent.ToString() + "%");
+                        int percent = Math.Round(battery.GetCompEM().GetEnergy0To1() * 100);
+                        m_txtBattery.SetText("Battery: " + percent + "%");
                     }
-                    else
-                    {
-                        m_txtBattery.SetText("Battery: --% (no battery)");
-                    }
+                    else m_txtBattery.SetText("Battery: --% (no battery)");
                 }
-                else
-                {
-                    m_txtBattery.SetText("Battery: --%");
-                }
+                else m_txtBattery.SetText("Battery: --%");
             }
         }
 
-        if (m_txtSignal)
-        {
-            m_txtSignal.SetText("Signal: ●●●○○");
-        }
+        if (m_txtSignal) m_txtSignal.SetText("Signal: ●●●○○");
     }
 
     override void OnShow()
@@ -380,9 +311,7 @@ class PDA_Menu extends UIScriptedMenu
             player.GetInputController().SetDisabled(true);
             player.GetActionManager().EnableActions(false);
         }
-
-        if (layoutRoot)
-            SetFocus(layoutRoot);
+        if (layoutRoot) SetFocus(layoutRoot);
     }
 
     override void OnHide()
