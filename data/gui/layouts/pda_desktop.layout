@@ -118,7 +118,6 @@ FrameWidgetClass PDA_Root {
        vexactpos 0
        hexactsize 0
        vexactsize 0
-       text "SystemMessage"
        "text halign" center
       }
      }
@@ -228,7 +227,7 @@ FrameWidgetClass PDA_Root {
      vexactsize 0
      {
       FrameWidgetClass screen_Register {
-       visible 1
+       visible 0
        ignorepointer 1
        position 0 0
        size 1 1
@@ -278,7 +277,7 @@ FrameWidgetClass PDA_Root {
            scaled 1
            style Editor
            text "Login Name..."
-           "exact text" 0
+           "exact text" 1
            "text halign" center
            "text valign" center
           }
@@ -310,7 +309,7 @@ FrameWidgetClass PDA_Root {
            scriptclass ""
            style Editor
            text "**********"
-           "exact text" 0
+           "exact text" 1
            "text halign" center
            "text valign" center
           }
@@ -340,7 +339,7 @@ FrameWidgetClass PDA_Root {
            vexactsize 0
            style Editor
            text "**********"
-           "exact text" 0
+           "exact text" 1
            "text halign" center
            "text valign" center
           }
@@ -425,7 +424,7 @@ FrameWidgetClass PDA_Root {
            scaled 1
            style Editor
            text "Login Name..."
-           "exact text" 0
+           "exact text" 1
            "text halign" center
            "text valign" center
           }
@@ -458,7 +457,7 @@ FrameWidgetClass PDA_Root {
            text "**********"
            "limit visible" 0
            "Use default text" 0
-           "exact text" 0
+           "exact text" 1
            "text halign" center
            "text valign" center
           }
@@ -549,7 +548,7 @@ FrameWidgetClass PDA_Root {
            text "*******"
            "limit visible" 0
            "Use default text" 0
-           "exact text" 0
+           "exact text" 1
            "text halign" center
            "text valign" center
           }
@@ -703,7 +702,7 @@ FrameWidgetClass PDA_Root {
            text "Conctact Name..."
            "limit visible" 0
            "Use default text" 0
-           "exact text" 0
+           "exact text" 1
            "text valign" center
           }
          }
@@ -946,7 +945,7 @@ FrameWidgetClass PDA_Root {
            "no focus" 0
            text "Category Name...."
            "Use default text" 0
-           "exact text" 0
+           "exact text" 1
            "text valign" center
           }
          }
@@ -1024,7 +1023,7 @@ FrameWidgetClass PDA_Root {
            style Editor
            "no focus" 0
            text "Note Name..."
-           "exact text" 0
+           "exact text" 1
           }
          }
         }
