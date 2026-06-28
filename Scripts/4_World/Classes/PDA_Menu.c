@@ -247,7 +247,11 @@ class PDA_Menu extends UIScriptedMenu
             ShowSystemMessage("Login successful!");
             m_IsLoggedIn = true;
             s_IsLoggedInThisSession = true;
-            ShowMainScreen(data.param2 != "" ? data.param2 : "Home");
+
+            string lastScreen = data.param2;
+            if (lastScreen == "") lastScreen = "Home";
+
+            ShowMainScreen(lastScreen);
         }
         else
         {
