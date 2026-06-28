@@ -179,30 +179,40 @@ class PDA_Menu extends UIScriptedMenu
 
         if (name == "btn_Close") { Close(); return true; }
 
-        // Switch between Register and Login
+        // Switch between Register and Login screens
         if (name == "rgr_Login_btn")   { ShowAuthScreen("Login"); return true; }
         if (name == "lgn_Register_btn") { ShowAuthScreen("Register"); return true; }
 
-        // Register
+        // ==================== REGISTER ====================
         if (name == "rgr_Register_btn")
         {
-            string u = m_rgrName.GetText();
-            string p1 = m_rgrPassword.GetText();
-            string p2 = m_rgrPasswordAgain.GetText();
+            string regUser = m_rgrName.GetText();
+            string regPass1 = m_rgrPassword.GetText();
+            string regPass2 = m_rgrPasswordAgain.GetText();
 
-            if (u == "" || p1 == "" || p2 == "") { ShowSystemMessage("Please fill all fields"); return true; }
-            if (p1 != p2) { ShowSystemMessage("Passwords do not match!"); return true; }
+            if (regUser == "" || regPass1 == "" || regPass2 == "")
+            {
+                ShowSystemMessage("Please fill all fields");
+                return true;
+            }
 
-            GetRPCManager().SendRPC("PDA", "RPC_RegisterAccount", new Param2<string, string>(u, p1), true);
+            if (regPass1 != regPass2)
+            {
+                ShowSystemMessage("Passwords do not match!");
+                return true;
+            }
+
+            GetRPCManager().SendRPC("PDA", "RPC_RegisterAccount", new Param2<string, string>(regUser, regPass1), true);
             return true;
         }
 
-        // Login
+        // ==================== LOGIN ====================
         if (name == "lgn_Login_btn")
         {
-            string u = m_lgnName.GetText();
-            string p = m_lgnPassword.GetText();
-            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(u, p), true);
+            string loginUser = m_lgnName.GetText();
+            string loginPass = m_lgnPassword.GetText();
+
+            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(loginUser, loginPass), true);
             return true;
         }
 
