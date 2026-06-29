@@ -3,7 +3,7 @@ class PDA_Menu extends UIScriptedMenu
     protected string m_LastOpenedApp = "Home";
     protected bool m_IsLoggedIn = false;
     protected bool m_IsRegistered = false;
-    protected bool m_StayLoggedIn = true;           // Default = stay logged in
+    protected bool m_StayLoggedIn = true;
 
     static bool s_IsLoggedInThisSession = false;
 
@@ -132,6 +132,9 @@ class PDA_Menu extends UIScriptedMenu
             GetRPCManager().AddRPC("PDA", "RPC_RegisterResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_LoginResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_SetPinResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_ChangePinResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_SetPinEnabledResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_VerifyPinResponse", this, SingleplayerExecutionType.Client);
 
             // Load registration state
             string registered;
@@ -178,6 +181,11 @@ class PDA_Menu extends UIScriptedMenu
         m_IsLoggedIn = true;
         s_IsLoggedInThisSession = true;
 
+        // Hide Profile sub-screens when switching away from Profile
+        if (m_screen_prf_AccountSettings) m_screen_prf_AccountSettings.Show(false);
+        if (m_screen_prf_Notifications)   m_screen_prf_Notifications.Show(false);
+
+        // Hide all auth screens
         if (m_screenRegister) m_screenRegister.Show(false);
         if (m_screenLogin)    m_screenLogin.Show(false);
         if (m_screenSetPin)   m_screenSetPin.Show(false);
@@ -185,6 +193,7 @@ class PDA_Menu extends UIScriptedMenu
 
         m_LastOpenedApp = screenName;
 
+        // Hide all main screens first
         if (m_screenHome)     m_screenHome.Show(false);
         if (m_screenMap)      m_screenMap.Show(false);
         if (m_screenContacts) m_screenContacts.Show(false);
@@ -192,12 +201,18 @@ class PDA_Menu extends UIScriptedMenu
         if (m_screenNotes)    m_screenNotes.Show(false);
         if (m_screenProfile)  m_screenProfile.Show(false);
 
+        // Show the correct screen
         if (screenName == "Home" && m_screenHome)         m_screenHome.Show(true);
         else if (screenName == "Map" && m_screenMap)      m_screenMap.Show(true);
         else if (screenName == "Contacts" && m_screenContacts) m_screenContacts.Show(true);
         else if (screenName == "Files" && m_screenFiles)  m_screenFiles.Show(true);
         else if (screenName == "Notes" && m_screenNotes)  m_screenNotes.Show(true);
-        else if (screenName == "Profile" && m_screenProfile) m_screenProfile.Show(true);
+        else if (screenName == "Profile" && m_screenProfile)
+        {
+            m_screenProfile.Show(true);
+            LoadProfileInfo();
+            ShowProfileSubScreen("Account");
+        }
         else
         {
             if (m_screenHome) m_screenHome.Show(true);
@@ -227,6 +242,22 @@ class PDA_Menu extends UIScriptedMenu
         if (m_prf_FirstLogin)    m_prf_FirstLogin.SetText("First Login: 02/04/2026");
         if (m_prf_TimeSurvived)  m_prf_TimeSurvived.SetText("Time Survived: 4d 18h");
         if (m_prf_TotalPlayTime) m_prf_TotalPlayTime.SetText("Total Playtime: 102h 45m");
+
+        LoadStayLoggedInSetting();
+    }
+
+    void LoadStayLoggedInSetting()
+    {
+        string stayLoggedIn;
+        if (GetGame().GetProfileString("PDA_StayLoggedIn", stayLoggedIn))
+        {
+            m_StayLoggedIn = (stayLoggedIn == "true");
+        }
+
+        if (m_prf_StayLogedIn_cb)
+        {
+            m_prf_StayLogedIn_cb.SetChecked(m_StayLoggedIn);
+        }
     }
 
     void LockBottomButtons(bool lock)
@@ -262,7 +293,7 @@ class PDA_Menu extends UIScriptedMenu
         if (name == "rgr_Login_btn")   { ShowAuthScreen("Login"); return true; }
         if (name == "lgn_Register_btn") { ShowAuthScreen("Register"); return true; }
 
-        // ==================== REGISTER ====================
+        // Register
         if (name == "rgr_Register_btn")
         {
             string regUser = m_rgrName.GetText();
@@ -285,11 +316,10 @@ class PDA_Menu extends UIScriptedMenu
             return true;
         }
 
-        // ==================== SET PIN ====================
+        // Set PIN
         if (name == "pn_SetPin_btn")
         {
             if (!m_pnSetPinCode) return true;
-
             string pin = m_pnSetPinCode.GetText();
             if (pin == "") { ShowSystemMessage("Please enter a PIN"); return true; }
 
@@ -304,18 +334,75 @@ class PDA_Menu extends UIScriptedMenu
             return true;
         }
 
-        // ==================== LOGIN ====================
-        if (name == "lgn_Login_btn")
+        // PIN Login button
+        if (name == "pn_Login_btn")
         {
-            string loginUser = m_lgnName.GetText();
-            string loginPass = m_lgnPassword.GetText();
+            if (!m_pnPinCode) return true;
+            string pin = m_pnPinCode.GetText();
+            if (pin == "") { ShowSystemMessage("Please enter your PIN"); return true; }
 
-            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(loginUser, loginPass), true);
+            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            if (player && player.GetIdentity())
+            {
+                GetRPCManager().SendRPC("PDA", "RPC_VerifyPin", new Param2<string, string>(player.GetIdentity().GetName(), pin), true);
+            }
+            return true;
+        }
+
+        // Change PIN
+        if (name == "prf_PinSet_btn")
+        {
+            if (!m_prf_PinOld || !m_prf_PinNew) return true;
+
+            string oldPin = m_prf_PinOld.GetText();
+            string newPin = m_prf_PinNew.GetText();
+
+            if (oldPin == "" || newPin == "")
+            {
+                ShowSystemMessage("Please fill both PIN fields");
+                return true;
+            }
+
+            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            if (player && player.GetIdentity())
+            {
+                GetRPCManager().SendRPC("PDA", "RPC_ChangePin", 
+                    new Param3<string, string, string>(player.GetIdentity().GetName(), oldPin, newPin), true);
+            }
+            return true;
+        }
+
+        // PIN Checkbox
+        if (name == "prf_Pin_cb")
+        {
+            if (!m_prf_Pin_cb) return true;
+
+            bool enabled = m_prf_Pin_cb.IsChecked();
+            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            if (player && player.GetIdentity())
+            {
+                GetRPCManager().SendRPC("PDA", "RPC_SetPinEnabled", new Param2<string, bool>(player.GetIdentity().GetName(), enabled), true);
+            }
+            ShowSystemMessage(enabled ? "PIN login enabled" : "PIN login disabled");
+            return true;
+        }
+
+        // Stay Logged In Checkbox
+        if (name == "prf_StayLogedIn_cb")
+        {
+            if (m_prf_StayLogedIn_cb)
+            {
+                m_StayLoggedIn = m_prf_StayLogedIn_cb.IsChecked();
+                GetGame().SetProfileString("PDA_StayLoggedIn", m_StayLoggedIn ? "true" : "false");
+                ShowSystemMessage(m_StayLoggedIn ? "Stay logged in enabled" : "Stay logged in disabled");
+            }
             return true;
         }
 
         if (!m_IsLoggedIn) return false;
 
+        if (name == "prf_AccountSettings_btn")       { ShowProfileSubScreen("Account"); return true; }
+        if (name == "prf_NotificationsSettings_btn") { ShowProfileSubScreen("Notifications"); return true; }
         if (name == "btn_Home")     { ShowMainScreen("Home"); return true; }
         if (name == "btn_Map")      { ShowMainScreen("Map"); return true; }
         if (name == "btn_Contacts") { ShowMainScreen("Contacts"); return true; }
@@ -353,17 +440,26 @@ class PDA_Menu extends UIScriptedMenu
     void RPC_LoginResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
     {
         if (type != CallType.Client) return;
-        Param1<bool> data;
+        Param2<bool, bool> data;
         if (!ctx.Read(data)) return;
 
-        if (data.param1)
+        bool success     = data.param1;
+        bool requiresPin = data.param2;
+
+        if (success)
         {
             ShowSystemMessage("Login successful!");
             m_IsLoggedIn = true;
             s_IsLoggedInThisSession = true;
 
-            // TODO: Later check if user has PIN enabled on server
-            ShowMainScreen(m_LastOpenedApp);
+            if (requiresPin)
+            {
+                ShowAuthScreen("Pin");
+            }
+            else
+            {
+                ShowMainScreen(m_LastOpenedApp);
+            }
         }
         else
         {
@@ -381,6 +477,53 @@ class PDA_Menu extends UIScriptedMenu
             ShowSystemMessage("PIN updated successfully!");
         else
             ShowSystemMessage("Failed to update PIN.");
+    }
+
+    void RPC_ChangePinResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+        Param1<bool> data;
+        if (!ctx.Read(data)) return;
+
+        if (data.param1)
+        {
+            ShowSystemMessage("PIN changed successfully!");
+            m_prf_PinOld.SetText("");
+            m_prf_PinNew.SetText("");
+        }
+        else
+        {
+            ShowSystemMessage("Failed to change PIN. Wrong old PIN?");
+        }
+    }
+
+    void RPC_SetPinEnabledResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+        Param1<bool> data;
+        if (!ctx.Read(data)) return;
+
+        if (!data.param1)
+        {
+            ShowSystemMessage("Failed to update PIN setting.");
+        }
+    }
+
+    void RPC_VerifyPinResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+        Param1<bool> data;
+        if (!ctx.Read(data)) return;
+
+        if (data.param1)
+        {
+            ShowSystemMessage("PIN verified!");
+            ShowMainScreen(m_LastOpenedApp);
+        }
+        else
+        {
+            ShowSystemMessage("Incorrect PIN. Please try again.");
+        }
     }
 
     // ==================== OTHER ====================
@@ -452,6 +595,12 @@ class PDA_Menu extends UIScriptedMenu
         {
             player.GetInputController().SetDisabled(false);
             player.GetActionManager().EnableActions(true);
+        }
+
+        // Stay Logged In logic
+        if (!m_StayLoggedIn)
+        {
+            s_IsLoggedInThisSession = false;
         }
     }
 }
