@@ -258,28 +258,38 @@ class PDA_Menu extends UIScriptedMenu
 
         if (name == "btn_Close") { Close(); return true; }
 
-        // Auth switching
+        // Switch between Register and Login
         if (name == "rgr_Login_btn")   { ShowAuthScreen("Login"); return true; }
         if (name == "lgn_Register_btn") { ShowAuthScreen("Register"); return true; }
 
-        // Register
+        // ==================== REGISTER ====================
         if (name == "rgr_Register_btn")
         {
-            string u = m_rgrName.GetText();
-            string p1 = m_rgrPassword.GetText();
-            string p2 = m_rgrPasswordAgain.GetText();
+            string regUser = m_rgrName.GetText();
+            string regPass1 = m_rgrPassword.GetText();
+            string regPass2 = m_rgrPasswordAgain.GetText();
 
-            if (u == "" || p1 == "" || p2 == "") { ShowSystemMessage("Please fill all fields"); return true; }
-            if (p1 != p2) { ShowSystemMessage("Passwords do not match!"); return true; }
+            if (regUser == "" || regPass1 == "" || regPass2 == "")
+            {
+                ShowSystemMessage("Please fill all fields");
+                return true;
+            }
 
-            GetRPCManager().SendRPC("PDA", "RPC_RegisterAccount", new Param2<string, string>(u, p1), true);
+            if (regPass1 != regPass2)
+            {
+                ShowSystemMessage("Passwords do not match!");
+                return true;
+            }
+
+            GetRPCManager().SendRPC("PDA", "RPC_RegisterAccount", new Param2<string, string>(regUser, regPass1), true);
             return true;
         }
 
-        // Set PIN after registration
+        // ==================== SET PIN ====================
         if (name == "pn_SetPin_btn")
         {
             if (!m_pnSetPinCode) return true;
+
             string pin = m_pnSetPinCode.GetText();
             if (pin == "") { ShowSystemMessage("Please enter a PIN"); return true; }
 
@@ -294,18 +304,15 @@ class PDA_Menu extends UIScriptedMenu
             return true;
         }
 
-        // Login
+        // ==================== LOGIN ====================
         if (name == "lgn_Login_btn")
         {
-            string u = m_lgnName.GetText();
-            string p = m_lgnPassword.GetText();
-            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(u, p), true);
+            string loginUser = m_lgnName.GetText();
+            string loginPass = m_lgnPassword.GetText();
+
+            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(loginUser, loginPass), true);
             return true;
         }
-
-        // Profile
-        if (name == "prf_AccountSettings_btn") { ShowProfileSubScreen("Account"); return true; }
-        if (name == "prf_NotificationsSettings_btn") { ShowProfileSubScreen("Notifications"); return true; }
 
         if (!m_IsLoggedIn) return false;
 
