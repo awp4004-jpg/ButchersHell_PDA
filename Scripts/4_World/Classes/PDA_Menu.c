@@ -286,6 +286,7 @@ class PDA_Menu extends UIScriptedMenu
         if (button != MouseState.LEFT) return false;
 
         string name = w.GetName();
+        PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer()); // Declared ONLY ONCE here
 
         if (name == "btn_Close") { Close(); return true; }
 
@@ -316,17 +317,46 @@ class PDA_Menu extends UIScriptedMenu
             return true;
         }
 
-        // Set PIN
+        // Switch from Login screen to Register screen
+        if (name == "lgn_Register_btn")
+        {
+            ShowAuthScreen("Register");
+            return true;
+        }
+        
+        // ==================== NORMAL LOGIN ====================
+        if (name == "lgn_Login_btn")
+        {
+            if (!m_lgnName || !m_lgnPassword)
+            {
+                ShowSystemMessage("Login fields not ready");
+                return true;
+            }
+
+            string username = m_lgnName.GetText();
+            string password = m_lgnPassword.GetText();
+
+            if (username == "" || password == "")
+            {
+                ShowSystemMessage("Please enter username and password");
+                return true;
+            }
+
+            GetRPCManager().SendRPC("PDA", "RPC_LoginAccount", new Param2<string, string>(username, password), true);
+            return true;
+        }
+
+        // Set PIN after registration
         if (name == "pn_SetPin_btn")
         {
             if (!m_pnSetPinCode) return true;
-            string pin = m_pnSetPinCode.GetText();
-            if (pin == "") { ShowSystemMessage("Please enter a PIN"); return true; }
 
-            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            string newPin = m_pnSetPinCode.GetText();
+            if (newPin == "") { ShowSystemMessage("Please enter a PIN"); return true; }
+
             if (player && player.GetIdentity())
             {
-                GetRPCManager().SendRPC("PDA", "RPC_SetPin", new Param2<string, string>(player.GetIdentity().GetName(), pin), true);
+                GetRPCManager().SendRPC("PDA", "RPC_SetPin", new Param2<string, string>(player.GetIdentity().GetName(), newPin), true);
             }
 
             ShowSystemMessage("PIN set successfully!");
@@ -338,13 +368,13 @@ class PDA_Menu extends UIScriptedMenu
         if (name == "pn_Login_btn")
         {
             if (!m_pnPinCode) return true;
-            string pin = m_pnPinCode.GetText();
-            if (pin == "") { ShowSystemMessage("Please enter your PIN"); return true; }
 
-            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            string enteredPin = m_pnPinCode.GetText();
+            if (enteredPin == "") { ShowSystemMessage("Please enter your PIN"); return true; }
+
             if (player && player.GetIdentity())
             {
-                GetRPCManager().SendRPC("PDA", "RPC_VerifyPin", new Param2<string, string>(player.GetIdentity().GetName(), pin), true);
+                GetRPCManager().SendRPC("PDA", "RPC_VerifyPin", new Param2<string, string>(player.GetIdentity().GetName(), enteredPin), true);
             }
             return true;
         }
@@ -355,19 +385,18 @@ class PDA_Menu extends UIScriptedMenu
             if (!m_prf_PinOld || !m_prf_PinNew) return true;
 
             string oldPin = m_prf_PinOld.GetText();
-            string newPin = m_prf_PinNew.GetText();
+            string updatedPin = m_prf_PinNew.GetText();
 
-            if (oldPin == "" || newPin == "")
+            if (oldPin == "" || updatedPin == "")
             {
                 ShowSystemMessage("Please fill both PIN fields");
                 return true;
             }
 
-            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
             if (player && player.GetIdentity())
             {
                 GetRPCManager().SendRPC("PDA", "RPC_ChangePin", 
-                    new Param3<string, string, string>(player.GetIdentity().GetName(), oldPin, newPin), true);
+                    new Param3<string, string, string>(player.GetIdentity().GetName(), oldPin, updatedPin), true);
             }
             return true;
         }
@@ -378,12 +407,21 @@ class PDA_Menu extends UIScriptedMenu
             if (!m_prf_Pin_cb) return true;
 
             bool enabled = m_prf_Pin_cb.IsChecked();
-            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+
             if (player && player.GetIdentity())
             {
                 GetRPCManager().SendRPC("PDA", "RPC_SetPinEnabled", new Param2<string, bool>(player.GetIdentity().GetName(), enabled), true);
             }
-            ShowSystemMessage(enabled ? "PIN login enabled" : "PIN login disabled");
+
+            if (enabled)
+            {
+                ShowSystemMessage("PIN login enabled");
+            }
+            else
+            {
+                ShowSystemMessage("PIN login disabled");
+            }
+
             return true;
         }
 
@@ -393,21 +431,37 @@ class PDA_Menu extends UIScriptedMenu
             if (m_prf_StayLogedIn_cb)
             {
                 m_StayLoggedIn = m_prf_StayLogedIn_cb.IsChecked();
-                GetGame().SetProfileString("PDA_StayLoggedIn", m_StayLoggedIn ? "true" : "false");
-                ShowSystemMessage(m_StayLoggedIn ? "Stay logged in enabled" : "Stay logged in disabled");
+
+                string stayLoggedInValue = "false";
+                if (m_StayLoggedIn) stayLoggedInValue = "true";
+
+                GetGame().SetProfileString("PDA_StayLoggedIn", stayLoggedInValue);
+
+                if (m_StayLoggedIn)
+                {
+                    ShowSystemMessage("Stay logged in enabled");
+                }
+                else
+                {
+                    ShowSystemMessage("Stay logged in disabled");
+                }
             }
             return true;
         }
 
         if (!m_IsLoggedIn) return false;
 
+        // Profile sub-screens
         if (name == "prf_AccountSettings_btn")       { ShowProfileSubScreen("Account"); return true; }
         if (name == "prf_NotificationsSettings_btn") { ShowProfileSubScreen("Notifications"); return true; }
+
+        // Main screens
         if (name == "btn_Home")     { ShowMainScreen("Home"); return true; }
         if (name == "btn_Map")      { ShowMainScreen("Map"); return true; }
         if (name == "btn_Contacts") { ShowMainScreen("Contacts"); return true; }
         if (name == "btn_Files")    { ShowMainScreen("Files"); return true; }
         if (name == "btn_Notes")    { ShowMainScreen("Notes"); return true; }
+
         if (name == "btn_Profile")
         {
             ShowMainScreen("Profile");
