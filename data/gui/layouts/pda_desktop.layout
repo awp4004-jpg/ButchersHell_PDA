@@ -1118,7 +1118,7 @@ FrameWidgetClass PDA_Root {
        }
       }
       FrameWidgetClass screen_Profile {
-       visible 1
+       visible 0
        ignorepointer 1
        position 0 0
        size 1 1
@@ -1308,7 +1308,7 @@ FrameWidgetClass PDA_Root {
          }
         }
         FrameWidgetClass screen_prf_AccountSettings {
-         visible 1
+         visible 0
          ignorepointer 1
          position 0 0
          size 0.4 1
