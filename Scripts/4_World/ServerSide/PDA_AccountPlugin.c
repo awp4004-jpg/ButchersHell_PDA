@@ -11,10 +11,10 @@ class PDA_AccountPlugin extends PluginBase
     {
         super.OnInit();
 
-        // Register RPCs
+        // Register all RPCs
         GetRPCManager().AddRPC("PDA", "RPC_RegisterAccount", this, SingleplayerExecutionType.Server);
         GetRPCManager().AddRPC("PDA", "RPC_LoginAccount", this, SingleplayerExecutionType.Server);
-        GetRPCManager().AddRPC("PDA", "RPC_SaveLastScreen", this, SingleplayerExecutionType.Server);
+        GetRPCManager().AddRPC("PDA", "RPC_SetPin", this, SingleplayerExecutionType.Server);
 
         LoadAccounts();
         Print("[PDA] PDA_AccountPlugin initialized on server");
@@ -28,7 +28,7 @@ class PDA_AccountPlugin extends PluginBase
         if (FileExist(path))
         {
             JsonFileLoader<ref map<string, ref PDA_Account>>.JsonLoadFile(path, m_Accounts);
-            Print("[PDA] Loaded " + m_Accounts.Count() + " accounts");
+            Print("[PDA] Loaded " + m_Accounts.Count() + " accounts from JSON");
         }
         else
         {
@@ -52,7 +52,7 @@ class PDA_AccountPlugin extends PluginBase
         ref PDA_Account newAccount = new PDA_Account();
         newAccount.username = username;
         newAccount.password = password;
-        newAccount.lastScreen = "Home";
+        newAccount.pin = "";                    // PIN is empty until user sets it
 
         m_Accounts.Insert(username, newAccount);
         SaveAccounts();
@@ -63,24 +63,19 @@ class PDA_AccountPlugin extends PluginBase
 
     bool LoginAccount(string username, string password)
     {
-        if (!m_Accounts.Contains(username))
-            return false;
-
+        if (!m_Accounts.Contains(username)) return false;
         return m_Accounts.Get(username).password == password;
     }
 
-    void SaveLastScreen(string username, string screen)
+    bool SetPin(string username, string newPin)
     {
-        if (!m_Accounts.Contains(username)) return;
+        if (!m_Accounts.Contains(username)) return false;
 
-        m_Accounts.Get(username).lastScreen = screen;
+        m_Accounts.Get(username).pin = newPin;
         SaveAccounts();
-    }
 
-    string GetLastScreen(string username)
-    {
-        if (!m_Accounts.Contains(username)) return "Home";
-        return m_Accounts.Get(username).lastScreen;
+        Print("[PDA] PIN updated for user: " + username);
+        return true;
     }
 
     // ==================== RPC Handlers ====================
@@ -102,30 +97,19 @@ class PDA_AccountPlugin extends PluginBase
         Param2<string, string> data;
         if (!ctx.Read(data)) return;
 
-        string username = data.param1;
-        string password = data.param2;
-
-        bool success = LoginAccount(username, password);
-
-        if (success)
-        {
-            string lastScreen = GetLastScreen(username);
-            GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", new Param2<bool, string>(true, lastScreen), true, sender);
-        }
-        else
-        {
-            GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", new Param2<bool, string>(false, ""), true, sender);
-        }
+        bool success = LoginAccount(data.param1, data.param2);
+        GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", new Param1<bool>(success), true, sender);
     }
 
-    void RPC_SaveLastScreen(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    void RPC_SetPin(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
     {
         if (type != CallType.Server || !sender) return;
 
         Param2<string, string> data;
         if (!ctx.Read(data)) return;
 
-        SaveLastScreen(data.param1, data.param2);
+        bool success = SetPin(data.param1, data.param2);
+        GetRPCManager().SendRPC("PDA", "RPC_SetPinResponse", new Param1<bool>(success), true, sender);
     }
 }
 
@@ -134,5 +118,5 @@ class PDA_Account
 {
     string username;
     string password;
-    string lastScreen = "Home";
+    string pin = "";
 }
