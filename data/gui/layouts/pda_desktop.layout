@@ -308,7 +308,6 @@ FrameWidgetClass PDA_Root {
            vexactsize 0
            scriptclass ""
            style Editor
-           text "**********"
            "exact text" 1
            "text halign" center
            "text valign" center
@@ -339,7 +338,6 @@ FrameWidgetClass PDA_Root {
            hexactsize 0
            vexactsize 0
            style Editor
-           text "**********"
            "exact text" 1
            "text halign" center
            "text valign" center
@@ -456,7 +454,6 @@ FrameWidgetClass PDA_Root {
            vexactsize 0
            style Editor
            "no focus" 0
-           text "**********"
            "limit visible" 0
            "Use default text" 0
            "exact text" 1
@@ -492,6 +489,83 @@ FrameWidgetClass PDA_Root {
          style Editor
          "no focus" 1
          text "Register"
+        }
+       }
+      }
+      FrameWidgetClass screen_SetPin {
+       visible 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       {
+        FrameWidgetClass pn_SetPin {
+         ignorepointer 1
+         position 0 0
+         size 0.3 0.4
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass pn_SetPin_txt {
+           clipchildren 1
+           inheritalpha 0
+           ignorepointer 1
+           ignoregloballv 0
+           position 0 0
+           size 1 0.3
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Set PIN"
+           "exact text" 1
+           "size to text h" 0
+           "size to text v" 0
+           "text halign" center
+           "text valign" center
+          }
+          PasswordEditBoxWidgetClass pn__SetPinCode_txt {
+           size 1 0.3
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           "no focus" 0
+           "limit visible" 0
+           "Use default text" 0
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+           "hide text" 1
+          }
+          ButtonWidgetClass pn_SetPin_btn {
+           position 0 0
+           size 1 0.3
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Set PIN"
+          }
+         }
         }
        }
       }
@@ -548,7 +622,6 @@ FrameWidgetClass PDA_Root {
            scaled 1
            style Editor
            "no focus" 0
-           text "*******"
            "limit visible" 0
            "Use default text" 0
            "exact text" 1
@@ -1195,10 +1268,50 @@ FrameWidgetClass PDA_Root {
           }
          }
         }
-        FrameWidgetClass prf_Settings {
+        FrameWidgetClass prf_SettingsMenu {
+         ignorepointer 1
+         position -0.05 0
+         size 0.3 1
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          ButtonWidgetClass prf_AccountSettings_btn {
+           position 0 0.02
+           size 0.9 0.08
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           "no focus" 1
+           text "Account Settings"
+          }
+          ButtonWidgetClass prf_NotificationsSettings_btn {
+           position 0 0.11
+           size 0.9 0.08
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           "no focus" 1
+           text "Notifications"
+          }
+         }
+        }
+        FrameWidgetClass screen_prf_AccountSettings {
+         visible 1
          ignorepointer 1
          position 0 0
-         size 0.3 1
+         size 0.4 1
          halign right_ref
          valign center_ref
          hexactpos 0
@@ -1206,113 +1319,139 @@ FrameWidgetClass PDA_Root {
          hexactsize 0
          vexactsize 0
          {
-          TextWidgetClass prf_Settings_txt {
+          TextWidgetClass prf_PinOnOff_txt {
            ignorepointer 1
-           position 0 0
-           size 1 0.06
+           position -0.27 0.12
+           size 0.4 0.08
            halign center_ref
            hexactpos 0
            vexactpos 0
            hexactsize 0
            vexactsize 0
-           text "Settings"
+           text "PIN"
            "exact text" 1
            "text halign" center
            "text valign" center
           }
-          FrameWidgetClass prf_Pin_Frame {
-           ignorepointer 1
-           position 0 0.07
-           size 1 0.406
+          CheckBoxWidgetClass prf_Pin_cb {
+           position -0.02 0.125
+           size 0.079 0.068
            halign center_ref
            hexactpos 0
            vexactpos 0
            hexactsize 0
            vexactsize 0
-           {
-            TextWidgetClass prf_Pin {
-             ignorepointer 1
-             position 0 -0.419
-             size 1 0.162
-             halign center_ref
-             valign center_ref
-             hexactpos 0
-             vexactpos 0
-             hexactsize 0
-             vexactsize 0
-             text "Pin"
-             "exact text" 1
-             "text halign" center
-             "text valign" center
-            }
-            CheckBoxWidgetClass prf_Pin_chekcbox {
-             position 0.045 0.03
-             size 0.097 0.113
-             halign right_ref
-             hexactpos 0
-             vexactpos 0
-             hexactsize 0
-             vexactsize 0
-             checked 0
-            }
-            PasswordEditBoxWidgetClass prf_PinCodeOld_txt {
-             position 0 -0.21
-             size 1 0.2
-             halign center_ref
-             valign center_ref
-             hexactpos 0
-             vexactpos 0
-             hexactsize 0
-             vexactsize 0
-             style Editor
-             "exact text" 1
-             "text halign" center
-             "text valign" center
-             "hide text" 1
-            }
-            ButtonWidgetClass prf_PinSave_btn {
-             position 0 0.23
-             size 1 0.2
-             halign center_ref
-             valign center_ref
-             hexactpos 0
-             vexactpos 0
-             hexactsize 0
-             vexactsize 0
-             style Editor
-             "no focus" 1
-             text "Save Pin"
-             switch normal
-            }
-            PasswordEditBoxWidgetClass prf_PinCodeNew_txt {
-             position 0 0
-             size 1 0.2
-             halign center_ref
-             valign center_ref
-             hexactpos 0
-             vexactpos 0
-             hexactsize 0
-             vexactsize 0
-             style Editor
-             "exact text" 1
-             "text halign" center
-             "text valign" center
-             "hide text" 1
-            }
-           }
           }
-          FrameWidgetClass prf_Account_Frame {
-           ignorepointer 1
-           position 0 0
-           size 1 0.528
+          PasswordEditBoxWidgetClass prf_PinOld_etxt {
+           position -0.27 -0.16
+           size 0.4 0.08
            halign center_ref
-           valign bottom_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "limit visible" 0
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+           "hide text" 1
+          }
+          PasswordEditBoxWidgetClass prf_PinNew_etxt {
+           position 0.16 -0.16
+           size 0.4 0.08
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "limit visible" 0
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+           "hide text" 1
+          }
+          TextWidgetClass prf_PinOld_txt {
+           ignorepointer 1
+           position -0.27 -0.24
+           size 0.4 0.06
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Old PIN"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          TextWidgetClass prf_PinNew_txt {
+           ignorepointer 1
+           position 0.153 -0.24
+           size 0.4 0.06
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "New PIN"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          ButtonWidgetClass prf_PinSet_btn {
+           position -0.05 0.4
+           size 0.4 0.06
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Set Pin"
+          }
+          TextWidgetClass prf_StayLogedIn_txt {
+           ignorepointer 1
+           position -0.28 0.03
+           size 0.42 0.08
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Stay Loged in"
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          CheckBoxWidgetClass prf_StayLogedIn_cb {
+           position -0.02 0.035
+           size 0.079 0.068
+           halign center_ref
            hexactpos 0
            vexactpos 0
            hexactsize 0
            vexactsize 0
           }
          }
+        }
+        FrameWidgetClass screen_prf_Notifications {
+         visible 0
+         ignorepointer 1
+         position 0 0
+         size 0.4 1
+         halign right_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
         }
        }
       }
