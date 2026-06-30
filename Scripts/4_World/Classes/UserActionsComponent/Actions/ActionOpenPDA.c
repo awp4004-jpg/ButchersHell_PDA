@@ -22,19 +22,9 @@ class ActionOpenPDA: ActionSingleUseBase
         return "Open PDA";
     }
 
-    override bool ActionCondition(PlayerBase player, ActionTarget target, ItemBase item)
+    override void OnExecuteClient(ActionData action_data)
     {
-        if (!item || !item.IsKindOf("PDA_Base")) return false;
-
-        PDA_Base pda = PDA_Base.Cast(item);
-        if (!pda) return false;
-
-        return pda.IsOn(); // Only allow opening if PDA is turned on
-    }
-
-    override void OnStartClient(ActionData action_data)
-    {
-        super.OnStartClient(action_data);
+        super.OnExecuteClient(action_data);
         GetGame().GetUIManager().EnterScriptedMenu(PDA_MENU.PDA, null);
     }
 }

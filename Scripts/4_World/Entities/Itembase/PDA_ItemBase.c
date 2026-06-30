@@ -1,6 +1,5 @@
-class PDA_Base extends ItemBase
+class PDA_Base extends Inventory_Base
 {
-    // Server-side only: stores the temporary PDA ID
     string m_PDAID;
 
     void PDA_Base()
@@ -8,7 +7,6 @@ class PDA_Base extends ItemBase
         m_PDAID = "";
     }
 
-    // ==================== PDA ID ====================
     void GeneratePDAID()
     {
         if (m_PDAID == "")
@@ -23,31 +21,9 @@ class PDA_Base extends ItemBase
         return m_PDAID;
     }
 
-    // ==================== Power State (using native functions) ====================
-    bool IsPoweredOn()
-    {
-        return IsOn(); // Uses the native IsOn() from InventoryItem
-    }
-
-    void TurnOn()
-    {
-        SwitchOn(true); // Native function - starts battery consumption
-        Print("[PDA] PDA turned ON");
-    }
-
-    void TurnOff()
-    {
-        SwitchOn(false); // Native function - stops battery consumption
-        Print("[PDA] PDA turned OFF");
-    }
-
-    // ==================== Actions ====================
     override void SetActions()
     {
         super.SetActions();
-
-        AddAction(ActionTurnOnPDA);
-        AddAction(ActionTurnOffPDA);
         AddAction(ActionOpenPDA);
     }
 
