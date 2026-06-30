@@ -18,6 +18,7 @@ class PDA_AccountPlugin extends PluginBase
         GetRPCManager().AddRPC("PDA", "RPC_VerifyPin", this, SingleplayerExecutionType.Server);
         GetRPCManager().AddRPC("PDA", "RPC_ChangePin", this, SingleplayerExecutionType.Server);
         GetRPCManager().AddRPC("PDA", "RPC_SetPinEnabled", this, SingleplayerExecutionType.Server);
+        GetRPCManager().AddRPC("PDA", "RPC_SetDisplayName", this, SingleplayerExecutionType.Server);
 
         LoadAccounts();
         Print("[PDA] PDA_AccountPlugin initialized on server");
@@ -47,7 +48,7 @@ class PDA_AccountPlugin extends PluginBase
     }
 
     // ==================== Account Logic ====================
-    bool RegisterAccount(string username, string password)
+    bool RegisterAccount(string username, string password, string steamID = "")
     {
         if (username == "" || password == "" || m_Accounts.Contains(username))
             return false;
@@ -55,13 +56,14 @@ class PDA_AccountPlugin extends PluginBase
         ref PDA_Account newAccount = new PDA_Account();
         newAccount.username = username;
         newAccount.password = password;
+        newAccount.steamID = steamID;
         newAccount.pin = "";
         newAccount.pinEnabled = false;
 
         m_Accounts.Insert(username, newAccount);
         SaveAccounts();
 
-        Print("[PDA] New account registered: " + username);
+        Print("[PDA] New account registered: " + username + " | SteamID: " + steamID);
         return true;
     }
 
@@ -119,6 +121,14 @@ class PDA_AccountPlugin extends PluginBase
         return m_Accounts.Get(username).pinEnabled;
     }
 
+    bool SetDisplayName(string username, string newName)
+    {
+        if (!m_Accounts.Contains(username) || newName == "") return false;
+
+        m_Accounts.Get(username).displayName = newName;
+        SaveAccounts();
+        return true;
+    }
     // ==================== RPC Handlers ====================
     void RPC_RegisterAccount(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
     {
@@ -127,7 +137,11 @@ class PDA_AccountPlugin extends PluginBase
         Param2<string, string> data;
         if (!ctx.Read(data)) return;
 
-        bool success = RegisterAccount(data.param1, data.param2);
+        string username = data.param1;
+        string password = data.param2;
+        string steamID = sender.GetPlainId();
+
+        bool success = RegisterAccount(username, password, steamID);   // Pass steamID
         GetRPCManager().SendRPC("PDA", "RPC_RegisterResponse", new Param1<bool>(success), true, sender);
     }
 
@@ -146,11 +160,15 @@ class PDA_AccountPlugin extends PluginBase
         if (passwordCorrect)
         {
             bool requiresPin = IsPinEnabled(username);
-            GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", new Param2<bool, bool>(true, requiresPin), true, sender);
+            string displayName = m_Accounts.Get(username).displayName;   // NEW
+
+            GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", 
+                new Param3<bool, bool, string>(true, requiresPin, displayName), true, sender);
         }
         else
         {
-            GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", new Param2<bool, bool>(false, false), true, sender);
+            GetRPCManager().SendRPC("PDA", "RPC_LoginResponse", 
+                new Param3<bool, bool, string>(false, false, ""), true, sender);
         }
     }
 
@@ -197,6 +215,18 @@ class PDA_AccountPlugin extends PluginBase
         bool success = SetPinEnabled(data.param1, data.param2);
         GetRPCManager().SendRPC("PDA", "RPC_SetPinEnabledResponse", new Param1<bool>(success), true, sender);
     }
+
+    void RPC_SetDisplayName(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Server || !sender) return;
+
+        Param2<string, string> data;
+        if (!ctx.Read(data)) return;
+
+        bool success = SetDisplayName(data.param1, data.param2);
+        GetRPCManager().SendRPC("PDA", "RPC_SetDisplayNameResponse", new Param1<bool>(success), true, sender);
+    }
+
 }
 
 // ==================== Account Data Class ====================
@@ -205,5 +235,7 @@ class PDA_Account
     string username;
     string password;
     string pin = "";
+    string steamID = "";
+    string displayName = "";
     bool pinEnabled = false;
 }

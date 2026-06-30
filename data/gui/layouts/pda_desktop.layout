@@ -276,7 +276,6 @@ FrameWidgetClass PDA_Root {
            vexactsize 0
            scaled 1
            style Editor
-           text "Login Name..."
            "exact text" 1
            "text halign" center
            "text valign" center
@@ -423,7 +422,6 @@ FrameWidgetClass PDA_Root {
            vexactsize 0
            scaled 1
            style Editor
-           text "Login Name..."
            "exact text" 1
            "text halign" center
            "text valign" center
@@ -492,7 +490,7 @@ FrameWidgetClass PDA_Root {
         }
        }
       }
-      FrameWidgetClass screen_SetPin {
+      FrameWidgetClass screen_SetupAccount {
        visible 0
        ignorepointer 1
        position 0 0
@@ -506,9 +504,8 @@ FrameWidgetClass PDA_Root {
        {
         FrameWidgetClass pn_SetPin {
          ignorepointer 1
-         position 0 0
+         position 0.05 0
          size 0.3 0.4
-         halign center_ref
          valign center_ref
          hexactpos 0
          vexactpos 0
@@ -553,7 +550,6 @@ FrameWidgetClass PDA_Root {
            "hide text" 1
           }
           ButtonWidgetClass pn_SetPin_btn {
-           position 0 0
            size 1 0.3
            halign center_ref
            valign bottom_ref
@@ -566,6 +562,81 @@ FrameWidgetClass PDA_Root {
            text "Set PIN"
           }
          }
+        }
+        FrameWidgetClass sa_SetAccount {
+         ignorepointer 1
+         position 0.05 0
+         size 0.3 0.4
+         halign right_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         {
+          TextWidgetClass sa_SetName {
+           clipchildren 1
+           inheritalpha 0
+           ignorepointer 1
+           ignoregloballv 0
+           position 0 0
+           size 1 0.3
+           halign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           text "Set account name"
+           "exact text" 1
+           text_proportion 0.9
+           "size to text h" 0
+           "size to text v" 0
+           "text halign" center
+           "text valign" center
+          }
+          EditBoxWidgetClass sa_SetName_txt {
+           size 1 0.3
+           halign center_ref
+           valign center_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           scaled 1
+           style Editor
+           "no focus" 0
+           "limit visible" 0
+           "Use default text" 0
+           "exact text" 1
+           "text halign" center
+           "text valign" center
+          }
+          ButtonWidgetClass sa_SetName_btn {
+           size 1 0.3
+           halign center_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Set Name"
+          }
+         }
+        }
+        ButtonWidgetClass pn_SetAccount_btn {
+         position 0 0.11
+         size 0.23 0.13
+         halign center_ref
+         valign bottom_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Editor
+         "no focus" 1
+         text "Set Account"
         }
        }
       }
@@ -753,9 +824,7 @@ FrameWidgetClass PDA_Root {
            "text valign" center
           }
           ButtonWidgetClass ctc_ContactAdd_btn {
-           position 0 0
-           size 1 0.07
-           halign center_ref
+           size 0.5 0.07
            valign bottom_ref
            hexactpos 0
            vexactpos 0
@@ -764,6 +833,18 @@ FrameWidgetClass PDA_Root {
            style Editor
            "no focus" 1
            text "Add Conctact"
+          }
+          ButtonWidgetClass ctc_ContactRemove_btn {
+           size 0.5 0.07
+           halign right_ref
+           valign bottom_ref
+           hexactpos 0
+           vexactpos 0
+           hexactsize 0
+           vexactsize 0
+           style Editor
+           "no focus" 1
+           text "Remove Conctact"
           }
           EditBoxWidgetClass ctc_ContactAdd_txt {
            position 0 0.07
