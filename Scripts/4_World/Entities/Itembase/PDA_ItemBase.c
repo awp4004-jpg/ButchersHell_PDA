@@ -3,13 +3,9 @@ class PDA_Base extends ItemBase
     // Server-side only: stores the temporary PDA ID
     string m_PDAID;
 
-    // On/Off state
-    protected bool m_IsOn = false;
-
     void PDA_Base()
     {
         m_PDAID = "";
-        m_IsOn = false;
     }
 
     // ==================== PDA ID ====================
@@ -27,40 +23,22 @@ class PDA_Base extends ItemBase
         return m_PDAID;
     }
 
-    // ==================== Power State ====================
-    bool IsOn()
+    // ==================== Power State (using native functions) ====================
+    bool IsPoweredOn()
     {
-        return m_IsOn;
+        return IsOn(); // Uses the native IsOn() from InventoryItem
     }
 
     void TurnOn()
     {
-        if (!m_IsOn)
-        {
-            m_IsOn = true;
-
-            if (GetCompEM())
-            {
-                GetCompEM().SwitchOn();
-            }
-
-            Print("[PDA] PDA turned ON");
-        }
+        SwitchOn(true); // Native function - starts battery consumption
+        Print("[PDA] PDA turned ON");
     }
 
     void TurnOff()
     {
-        if (m_IsOn)
-        {
-            m_IsOn = false;
-
-            if (GetCompEM())
-            {
-                GetCompEM().SwitchOff();
-            }
-
-            Print("[PDA] PDA turned OFF");
-        }
+        SwitchOn(false); // Native function - stops battery consumption
+        Print("[PDA] PDA turned OFF");
     }
 
     // ==================== Actions ====================
@@ -74,11 +52,6 @@ class PDA_Base extends ItemBase
     }
 
     override bool CanPutInCargo(EntityAI parent)
-    {
-        return true;
-    }
-
-    override bool CanPutOnBelt(EntityAI parent)
     {
         return true;
     }

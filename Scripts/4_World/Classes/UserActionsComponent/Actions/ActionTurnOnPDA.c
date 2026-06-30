@@ -24,12 +24,21 @@ class ActionTurnOnPDA: ActionSingleUseBase
 
     override bool ActionCondition(PlayerBase player, ActionTarget target, ItemBase item)
     {
-        if (!item || !item.IsKindOf("PDA_Base")) return false;
+        if (!item || !item.IsKindOf("PDA_Base")) 
+            return false;
 
         PDA_Base pda = PDA_Base.Cast(item);
-        if (!pda) return false;
+        if (!pda) 
+            return false;
 
-        return !pda.IsOn(); // Only show if PDA is off
+        // Only show action if PDA is OFF and has energy
+        if (pda.IsPoweredOn()) 
+            return false;
+
+        if (!pda.GetCompEM() || !pda.GetCompEM().CanSwitchOn()) 
+            return false;
+
+        return true;
     }
 
     override void OnExecuteClient(ActionData action_data)
