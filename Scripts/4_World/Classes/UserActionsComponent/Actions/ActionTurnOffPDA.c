@@ -1,6 +1,6 @@
-class ActionOpenPDA: ActionSingleUseBase
+class ActionTurnOffPDA: ActionSingleUseBase
 {
-    void ActionOpenPDA()
+    void ActionTurnOffPDA()
     {
         m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
         m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -19,7 +19,7 @@ class ActionOpenPDA: ActionSingleUseBase
 
     override string GetText()
     {
-        return "Open PDA";
+        return "Turn Off PDA";
     }
 
     override bool ActionCondition(PlayerBase player, ActionTarget target, ItemBase item)
@@ -29,12 +29,17 @@ class ActionOpenPDA: ActionSingleUseBase
         PDA_Base pda = PDA_Base.Cast(item);
         if (!pda) return false;
 
-        return pda.IsOn(); // Only allow opening if PDA is turned on
+        return pda.IsOn(); // Only show if PDA is on
     }
 
-    override void OnStartClient(ActionData action_data)
+    override void OnExecuteClient(ActionData action_data)
     {
-        super.OnStartClient(action_data);
-        GetGame().GetUIManager().EnterScriptedMenu(PDA_MENU.PDA, null);
+        super.OnExecuteClient(action_data);
+
+        ItemBase item = action_data.m_MainItem;
+        if (!item) return;
+
+        PDA_Base pda = PDA_Base.Cast(item);
+        if (pda) pda.TurnOff();
     }
 }
