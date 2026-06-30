@@ -25,34 +25,14 @@ modded class MissionGameplay
     {
         super.OnMissionFinish();
 
-        // Reset PDA login session if "Stay Logged In" is disabled
-        if (!PDA_Menu.s_IsLoggedInThisSession)
-        {
-            // Already logged out
-            Print("[PDA] Player disconnected - session was already ended");
-        }
-        else
-        {
-            // Check if user wanted to stay logged in
-            string stayLoggedIn;
-            if (GetGame().GetProfileString("PDA_StayLoggedIn", stayLoggedIn))
-            {
-                if (stayLoggedIn != "true")
-                {
-                    PDA_Menu.s_IsLoggedInThisSession = false;
-                    Print("[PDA] Player disconnected - Stay Logged In was OFF → session reset");
-                }
-                else
-                {
-                    Print("[PDA] Player disconnected - Stay Logged In was ON → keeping session");
-                }
-            }
-            else
-            {
-                // Default behavior if no setting saved
-                PDA_Menu.s_IsLoggedInThisSession = false;
-                Print("[PDA] Player disconnected - no Stay Logged In setting found → session reset");
-            }
-        }
+        // Force logout from PDA every time the player leaves the server
+        // (disconnect, crash, quit, etc.)
+        PDA_Menu.s_IsLoggedInThisSession = false;
+        PDA_Menu.s_PinEnabled = false;           // optional reset
+
+        // Clear saved username so they have to fully log in again next time
+        GetGame().SetProfileString("PDA_CurrentUsername", "");
+
+        Print("[PDA] Player left server → PDA session forcefully reset (force logout on reconnect)");
     }
 }

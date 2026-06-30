@@ -9,6 +9,7 @@ class PDA_Menu extends UIScriptedMenu
     protected string m_LastRegisteredUsername = "";
     protected string m_DisplayName = "";
     protected string m_CurrentUsername = "";
+    protected string m_SelectedContact = "";
     static bool s_PinEnabled = false;
     static bool s_IsLoggedInThisSession = false;
 
@@ -71,6 +72,16 @@ class PDA_Menu extends UIScriptedMenu
     protected PasswordEditBoxWidget m_prf_PinOld;
     protected PasswordEditBoxWidget m_prf_PinNew;
     protected ButtonWidget m_prf_PinSet_btn;
+
+    // Contacts screen widgets
+    protected TextListboxWidget m_ctcContactList;
+    protected ButtonWidget m_ctcContactAdd_btn;
+    protected ButtonWidget m_ctcContactRemove_btn;
+    protected EditBoxWidget m_ctcContactAdd_txt;
+
+    protected TextListboxWidget m_ctcChatMessages;
+    protected EditBoxWidget m_ctcChatSendMsg_txt;
+    protected ButtonWidget m_ctcChatSendMsg_btn;
 
     override Widget Init()
     {
@@ -139,6 +150,16 @@ class PDA_Menu extends UIScriptedMenu
             m_prf_PinNew    = PasswordEditBoxWidget.Cast(root.FindAnyWidget("prf_PinNew_etxt"));
             m_prf_PinSet_btn = ButtonWidget.Cast(root.FindAnyWidget("prf_PinSet_btn"));
 
+            // Contacts widgets
+            m_ctcContactList     = TextListboxWidget.Cast(root.FindAnyWidget("ctc_ContactList"));
+            m_ctcContactAdd_btn  = ButtonWidget.Cast(root.FindAnyWidget("ctc_ContactAdd_btn"));
+            m_ctcContactRemove_btn = ButtonWidget.Cast(root.FindAnyWidget("ctc_ContactRemove_btn"));
+            m_ctcContactAdd_txt  = EditBoxWidget.Cast(root.FindAnyWidget("ctc_ContactAdd_txt"));
+
+            m_ctcChatMessages    = TextListboxWidget.Cast(root.FindAnyWidget("ctc_ChatMessages"));
+            m_ctcChatSendMsg_txt = EditBoxWidget.Cast(root.FindAnyWidget("ctc_ChatSendMsg_txt"));
+            m_ctcChatSendMsg_btn = ButtonWidget.Cast(root.FindAnyWidget("ctc_ChatSendMsg_btn"));
+
             // RPCs
             GetRPCManager().AddRPC("PDA", "RPC_RegisterResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_LoginResponse", this, SingleplayerExecutionType.Client);
@@ -147,6 +168,11 @@ class PDA_Menu extends UIScriptedMenu
             GetRPCManager().AddRPC("PDA", "RPC_SetPinEnabledResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_VerifyPinResponse", this, SingleplayerExecutionType.Client);
             GetRPCManager().AddRPC("PDA", "RPC_SetDisplayNameResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_AddContactResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_RemoveContactResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_GetContactsResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_SendMessageResponse", this, SingleplayerExecutionType.Client);
+            GetRPCManager().AddRPC("PDA", "RPC_GetMessagesResponse", this, SingleplayerExecutionType.Client);
 
             // Load registration state
             string registered;
@@ -231,7 +257,11 @@ class PDA_Menu extends UIScriptedMenu
         // Show the correct screen
         if (screenName == "Home" && m_screenHome)         m_screenHome.Show(true);
         else if (screenName == "Map" && m_screenMap)      m_screenMap.Show(true);
-        else if (screenName == "Contacts" && m_screenContacts) m_screenContacts.Show(true);
+        else if (screenName == "Contacts" && m_screenContacts)
+        {
+            m_screenContacts.Show(true);
+            RequestContacts();
+        }
         else if (screenName == "Files" && m_screenFiles)  m_screenFiles.Show(true);
         else if (screenName == "Notes" && m_screenNotes)  m_screenNotes.Show(true);
         else if (screenName == "Profile" && m_screenProfile)
@@ -311,6 +341,57 @@ class PDA_Menu extends UIScriptedMenu
             m_SystemMessage.SetText("");
     }
 
+    // ==================== Chat System ====================
+    void RequestContacts()
+    {
+        string username = m_CurrentUsername;
+
+        if (username == "")
+        {
+            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            if (player && player.GetIdentity())
+                username = player.GetIdentity().GetName();
+        }
+
+        if (username != "")
+            GetRPCManager().SendRPC("PDA", "RPC_GetContacts", new Param1<string>(username), true);
+    }
+
+    void SelectContact()
+    {
+        if (!m_ctcContactList) return;
+
+        int selectedRow = m_ctcContactList.GetSelectedRow();
+        if (selectedRow < 0) return;
+
+        string contactName;
+        m_ctcContactList.GetItemText(selectedRow, 0, contactName);
+
+        m_SelectedContact = contactName;
+
+        // Request chat history with this contact
+        RequestChatWith(m_SelectedContact);
+    }
+
+    void RequestChatWith(string contactName)
+    {
+        if (contactName == "") return;
+
+        string username = m_CurrentUsername;
+
+        if (username == "")
+        {
+            PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+            if (player && player.GetIdentity())
+                username = player.GetIdentity().GetName();
+        }
+
+        if (username != "")
+        {
+            GetRPCManager().SendRPC("PDA", "RPC_GetMessages", new Param2<string, string>(username, contactName), true);
+        }
+    }
+
     // ==================== BUTTON HANDLING ====================
     override bool OnClick(Widget w, int x, int y, int button)
     {
@@ -320,6 +401,13 @@ class PDA_Menu extends UIScriptedMenu
         PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer()); // Declared ONLY ONCE here
 
         if (name == "btn_Close") { Close(); return true; }
+
+        // Refres Contact List 
+        if (name == "ctc_ContactList")
+        {
+            SelectContact();
+            return true;
+        }
 
         // Switch between Register and Login
         if (name == "rgr_Login_btn")   { ShowAuthScreen("Login"); return true; }
@@ -572,6 +660,70 @@ class PDA_Menu extends UIScriptedMenu
             return true;
         }
 
+        // ==================== Contact Screen ====================
+
+        // Send Message Button
+        if (name == "ctc_ChatSendMsg_btn")
+        {
+            if (!m_ctcChatSendMsg_txt || m_SelectedContact == "") return true;
+
+            string message = m_ctcChatSendMsg_txt.GetText();
+            if (message == "") return true;
+
+            if (!player || !player.GetIdentity()) return true;
+
+            string chatUsername = m_CurrentUsername;
+            if (chatUsername == "") chatUsername = player.GetIdentity().GetName();
+
+            GetRPCManager().SendRPC("PDA", "RPC_SendMessage", 
+                new Param3<string, string, string>(chatUsername, m_SelectedContact, message), true);
+
+            m_ctcChatSendMsg_txt.SetText(""); // Clear input
+            Print("[PDA] Message sent to: " + m_SelectedContact);
+
+            return true;
+        }
+
+        // Add Contact
+        if (name == "ctc_ContactAdd_btn")
+        {
+            if (!m_ctcContactAdd_txt) return true;
+
+            string contactName = m_ctcContactAdd_txt.GetText();
+            if (contactName == "") return true;
+
+            if (!player || !player.GetIdentity()) return true;
+
+            string addContactUsername = m_CurrentUsername;
+            if (addContactUsername == "") addContactUsername = player.GetIdentity().GetName();
+
+            GetRPCManager().SendRPC("PDA", "RPC_AddContact", new Param2<string, string>(addContactUsername, contactName), true);
+            m_ctcContactAdd_txt.SetText(""); // Clear input
+
+            return true;
+        }
+
+        // Remove Contact
+        if (name == "ctc_ContactRemove_btn")
+        {
+            if (!m_ctcContactList) return true;
+
+            int selectedRow = m_ctcContactList.GetSelectedRow();
+            if (selectedRow < 0) return true;
+
+            string contactToRemove;
+            m_ctcContactList.GetItemText(selectedRow, 0, contactToRemove);
+
+            if (!player || !player.GetIdentity()) return true;
+
+            string removeContactUsername = m_CurrentUsername;
+            if (removeContactUsername == "") removeContactUsername = player.GetIdentity().GetName();
+
+            GetRPCManager().SendRPC("PDA", "RPC_RemoveContact", new Param2<string, string>(removeContactUsername, contactToRemove), true);
+
+            return true;
+        }
+
         if (!m_IsLoggedIn) return false;
 
         // Profile sub-screens
@@ -725,6 +877,81 @@ class PDA_Menu extends UIScriptedMenu
         else
         {
             ShowSystemMessage("Failed to save account name.");
+        }
+    }
+
+    void RPC_GetContactsResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+
+        Param1<ref array<string>> data;
+        if (!ctx.Read(data)) return;
+
+        if (m_ctcContactList)
+        {
+            m_ctcContactList.ClearItems();
+
+            array<string> contacts = data.param1;
+            foreach (string contact : contacts)
+            {
+                int row = m_ctcContactList.AddItem(contact, null, 0);
+                // You can add logic here later to highlight if unread
+            }
+        }
+    }
+
+    void RPC_AddContactResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+        RequestContacts(); // Refresh list
+    }
+
+    void RPC_RemoveContactResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+        RequestContacts(); // Refresh list
+    }
+
+    void RPC_SendMessageResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+
+        Param1<bool> data;
+        if (!ctx.Read(data)) return;
+
+        if (data.param1)
+        {
+            ShowSystemMessage("Message sent");
+
+            // Refresh chat if we have a contact selected
+            if (m_SelectedContact != "")
+            {
+                RequestChatWith(m_SelectedContact);
+            }
+        }
+        else
+        {
+            ShowSystemMessage("Failed to send message");
+        }
+    }
+
+    void RPC_GetMessagesResponse(CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target)
+    {
+        if (type != CallType.Client) return;
+
+        Param1<ref array<ref ChatMessage>> data;
+        if (!ctx.Read(data)) return;
+
+        if (!m_ctcChatMessages) return;
+
+        m_ctcChatMessages.ClearItems();
+
+        array<ref ChatMessage> messages = data.param1;
+
+        foreach (ref ChatMessage msg : messages)
+        {
+            string displayText = msg.from + ": " + msg.message;
+            m_ctcChatMessages.AddItem(displayText, null, 0);
         }
     }
 
